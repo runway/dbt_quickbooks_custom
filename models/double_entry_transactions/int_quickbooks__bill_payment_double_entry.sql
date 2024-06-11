@@ -27,7 +27,8 @@ ap_accounts as (
 
     select
         account_id,
-        source_relation
+        source_relation,
+        currency_id
     from accounts
 
     where account_type = '{{ var('quickbooks__accounts_payable_reference', 'Accounts Payable') }}'
@@ -53,6 +54,7 @@ bill_payment_join as (
 
     left join ap_accounts
         on ap_accounts.source_relation = bill_payments.source_relation
+        and ap_accounts.currency_id = bill_payments.currency_id
 ),
 
 final as (
