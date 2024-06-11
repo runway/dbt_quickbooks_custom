@@ -33,6 +33,7 @@ ar_accounts as (
     where account_type = '{{ var('quickbooks__accounts_receivable_reference', 'Accounts Receivable') }}'
         and is_active
         and not is_sub_account
+        and name != 'Allowance for Doubtful Accounts'
 ),
 
 payment_join as (
