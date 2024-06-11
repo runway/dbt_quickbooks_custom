@@ -91,6 +91,7 @@ ar_accounts as (
     from accounts
 
     where account_type = '{{ var('quickbooks__accounts_receivable_reference', 'Accounts Receivable') }}'
+    and name != 'Allowance for Doubtful Accounts'
 ),
 
 invoice_join as (
