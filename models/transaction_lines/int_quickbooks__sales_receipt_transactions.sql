@@ -38,7 +38,10 @@ final as (
         cast(null as {{ dbt.type_string() }}) as vendor_id,
         cast(null as {{ dbt.type_string() }}) as billable_status,
         sales_receipt_lines.description,
-        sales_receipt_lines.amount,
+        case 
+            when sales_receipt_lines.index = 0 then (sales_receipt_lines.amount + sales_receipts.total_tax)
+            else sales_receipt_lines.amount 
+        end amount,
         sales_receipts.total_amount
     from sales_receipts
 
