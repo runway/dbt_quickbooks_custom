@@ -36,7 +36,7 @@ bill_join as (
         bills.source_relation,
         bill_lines.index,
         bills.transaction_date,
-        (bill_lines.amount*bills.exchange_rate) as amount,
+        (bill_lines.amount*coalesce(bills.exchange_rate,1)) as amount,
         bill_lines.amount unexchanged_amount,
         coalesce(bill_lines.account_expense_account_id,items.asset_account_id, items.expense_account_id, items.parent_expense_account_id, items.expense_account_id, items.parent_income_account_id, items.income_account_id) as payed_to_account_id,
         bills.payable_account_id,

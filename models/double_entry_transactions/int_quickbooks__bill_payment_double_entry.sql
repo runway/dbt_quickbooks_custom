@@ -44,7 +44,7 @@ bill_payment_join as (
         row_number() over(partition by bill_payments.bill_payment_id, bill_payments.source_relation 
             order by bill_payments.source_relation, bill_payments.transaction_date) - 1 as index,
         bill_payments.transaction_date,
-        (bill_payments.total_amount*bill_payments.exchange_rate) as amount,
+        (bill_payments.total_amount*coalesce(bill_payments.exchange_rate,1)) as amount,
         bill_payments.total_amount unexchanged_amount,
         coalesce(bill_payments.credit_card_account_id,bill_payments.check_bank_account_id) as payment_account_id,
         ap_accounts.account_id,
