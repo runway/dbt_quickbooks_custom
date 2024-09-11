@@ -39,10 +39,10 @@ final as (
         cast(null as {{ dbt.type_string() }}) as billable_status,
         sales_receipt_lines.description,
         case 
-            when sales_receipt_lines.index = 0 then (sales_receipt_lines.amount + sales_receipts.total_tax)
-            else sales_receipt_lines.amount 
+            when sales_receipt_lines.index = 0 then (sales_receipt_lines.amount + sales_receipts.total_tax) * (coalesce(sales_receipts.exchange_rate, 1))
+            else sales_receipt_lines.amount * (coalesce(sales_receipts.exchange_rate, 1))
         end amount,
-        sales_receipts.total_amount
+        sales_receipts.total_amount * (coalesce(sales_receipts.exchange_rate, 1) as total_amount
     from sales_receipts
 
     inner join sales_receipt_lines

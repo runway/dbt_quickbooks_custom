@@ -28,8 +28,8 @@ final as (
         cast(null as {{ dbt.type_string() }}) as vendor_id,
         cast(null as {{ dbt.type_string() }}) as billable_status,
         deposit_lines.description,
-        deposit_lines.amount,
-        deposits.total_amount
+        deposit_lines.amount * (coalesce(deposits.home_total_amount/deposits.total_amount, 1)) amount,
+        deposits.total_amount * (coalesce(deposits.home_total_amount/deposits.total_amount, 1)) total_amount
     from deposits
     
     inner join deposit_lines 
