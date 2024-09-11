@@ -41,8 +41,8 @@ final as (
         cast(null as {{ dbt.type_string() }}) as vendor_id,
         cast(null as {{ dbt.type_string() }}) as billable_status,
         invoice_lines.description,
-        invoice_lines.amount,
-        invoices.total_amount
+        invoice_lines.amount * coalesce(invoices.exchange_rate, 1) amount,
+        invoices.total_amount * coalesce(invoices.exchange_rate, 1) total_amount
     from invoices
 
     inner join invoice_lines
