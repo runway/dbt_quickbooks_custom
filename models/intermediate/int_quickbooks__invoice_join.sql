@@ -95,11 +95,11 @@ final as (
         invoice_link.billing_address_id,
         invoice_link.shipping_address_id,
         invoice_link.delivery_type,
-        invoice_link.total_amount as total_amount,
+        (invoice_link.total_amount * coalesce(invoice_link.exchange_rate, 1)) as total_amount,
         invoice_link.balance as current_balance,
 
         {% if var('using_estimate', True) %}
-        coalesce(estimates.total_amount, 0) as estimate_total_amount,
+        coalesce(estimates.total_amount, 0) * coalesce(estimates.exchange_rate, 1) as estimate_total_amount,
         estimates.transaction_status as estimate_status,
 
         {% else %}
@@ -111,7 +111,7 @@ final as (
         invoice_link.due_date as due_date,
         min(payments.transaction_date) as initial_payment_date,
         max(payments.transaction_date) as recent_payment_date,
-        sum(coalesce(payment_lines_payment.amount, 0)) as total_current_payment
+        sum(coalesce(payment_lines_payment.amount, 0) * coalesce(payments.exchange_rate, 1)) as total_current_payment
 
     from invoice_link
 
