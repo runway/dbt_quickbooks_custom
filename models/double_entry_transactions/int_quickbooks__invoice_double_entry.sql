@@ -87,7 +87,8 @@ ar_accounts as (
 
     select 
         account_id,
-        source_relation
+        source_relation,
+        currency_id
     from accounts
 
     where account_type = '{{ var('quickbooks__accounts_receivable_reference', 'Accounts Receivable') }}'
@@ -101,12 +102,17 @@ invoice_join as (
     select
         invoices.invoice_id as transaction_id,
         invoices.source_relation,
+        invoices.currency_id,
         invoice_lines.index,
         invoices.transaction_date as transaction_date,
 
         {% if var('using_invoice_bundle', True) %}
         case when invoice_lines.bundle_id is not null and invoices.total_amount = 0 then invoices.total_amount
             else invoice_lines.amount
+        end as unexchanged_amount,
+        case when invoice_lines.bundle_id is not null and invoices.total_amount = 0 
+            then (invoices.total_amount * coalesce(invoices.exchange_rate, 1))
+            else (invoice_lines.amount * coalesce(invoices.exchange_rate, 1))
         end as amount,
         case when invoice_lines.detail_type is not null then invoice_lines.detail_type
             when coalesce(invoice_lines.sales_item_account_id, invoice_lines.account_id, items.parent_income_account_id, items.income_account_id, bundle_income_accounts.account_id) is not null then 'SalesItemLineDetail'
@@ -116,7 +122,8 @@ invoice_join as (
         coalesce(invoice_lines.sales_item_account_id, invoice_lines.account_id, items.parent_income_account_id, items.income_account_id, bundle_income_accounts.account_id, invoice_lines.discount_account_id) as account_id,
 
         {% else %}
-        invoice_lines.amount as amount,
+        invoice_lines.amount as unexchanged_amount,
+        (invoice_lines.amount * coalesce(invoices.exchange_rate, 1)) as amount,
         case when invoice_lines.detail_type is not null then invoice_lines.detail_type
             when coalesce(invoice_lines.sales_item_account_id, invoice_lines.account_id, items.parent_income_account_id, items.income_account_id) is not null then 'SalesItemLineDetail'
             when invoice_lines.discount_account_id is not null then 'DiscountLineDetail'
@@ -165,6 +172,7 @@ final as (
         customer_id,
         cast(null as {{ dbt.type_string() }}) as vendor_id,
         amount,
+        unexchanged_amount,
         account_id,
         class_id,
         department_id,
@@ -186,6 +194,7 @@ final as (
         customer_id,
         cast(null as {{ dbt.type_string() }}) as vendor_id,
         amount,
+        unexchanged_amount,
         ar_accounts.account_id,
         class_id,
         department_id,
@@ -199,6 +208,7 @@ final as (
 
     left join ar_accounts
         on ar_accounts.source_relation = invoice_filter.source_relation
+        and ar_accounts.currency_id = invoice_filter.currency_id
 )
 
 select *
