@@ -30,10 +30,10 @@ final as (
         cast(billable_status as {{ dbt.type_string() }}) as billable_status,
         journal_entry_lines.description,
         case when lower(journal_entry_lines.posting_type) = 'credit'
-            then journal_entry_lines.amount * coalesce(-journal_entries.exchange_rate, -1)
-            else journal_entry_lines.amount * coalesce(journal_entries.exchange_rate, 1)
-        end amount,
-        journal_entries.total_amount * coalesce(journal_entries.exchange_rate, 1) total_amount
+            then journal_entry_lines.amount * -1 
+            else journal_entry_lines.amount 
+                end as amount,
+        journal_entries.total_amount
     from journal_entries
 
     inner join journal_entry_lines

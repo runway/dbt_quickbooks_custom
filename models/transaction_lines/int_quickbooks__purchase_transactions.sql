@@ -32,12 +32,12 @@ final as (
         coalesce(purchase_lines.account_expense_billable_status, purchase_lines.item_expense_billable_status) as billable_status,
         purchase_lines.description,
         case when coalesce(purchases.credit, false)
-            then purchase_lines.amount * coalesce(-purchases.exchange_rate, -1)
-            else purchase_lines.amount * coalesce(purchases.exchange_rate, 1)
+            then -1 * purchase_lines.amount
+            else purchase_lines.amount
         end as amount,
         case when coalesce(purchases.credit, false) 
-            then purchases.total_amount * coalesce(-purchases.exchange_rate, -1)
-            else purchases.total_amount * coalesce(purchases.exchange_rate, 1)
+            then -1 * purchases.total_amount
+            else purchases.total_amount
         end as total_amount
     from purchases
 
