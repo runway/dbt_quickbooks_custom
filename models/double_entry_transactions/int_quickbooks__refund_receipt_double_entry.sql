@@ -39,9 +39,14 @@ refund_receipt_join as (
         case 
             when refund_receipt_lines.index = 0 then (refund_receipt_lines.amount + refund_receipts.total_tax)
             else refund_receipt_lines.amount 
-        end temp_amount,
-        temp_amount unexchanged_amount,
-        (temp_amount * coalesce(refund_receipts.exchange_rate, 1)) amount,
+        end temp_tax_amount,
+        case 
+            when refund_receipt_lines.discount_account_id is not null 
+            then temp_tax_amount * (-1)
+            else temp_tax_amount
+        end as temp_flipped_amount,
+        temp_flipped_amount unexchanged_amount,
+        (temp_flipped_amount * coalesce(refund_receipts.exchange_rate, 1)) amount,
         refund_receipts.deposit_to_account_id as credit_to_account_id,
         coalesce(refund_receipt_lines.discount_account_id, refund_receipt_lines.sales_item_account_id, items.parent_income_account_id, items.income_account_id) as debit_account_id,
         refund_receipts.customer_id,
