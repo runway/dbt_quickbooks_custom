@@ -50,8 +50,12 @@ credit_memo_join as (
         credit_memos.source_relation,
         credit_memo_lines.index,
         credit_memos.transaction_date,
-        credit_memo_lines.amount unexchanged_amount,
-        (credit_memo_lines.amount * coalesce(credit_memos.exchange_rate, 1)) amount,
+        case 
+            when credit_memo_lines.index = 0 then (credit_memo_lines.amount + credit_memos.total_tax)
+            else credit_memo_lines.amount 
+        end temp_amount,
+        temp_amount unexchanged_amount,
+        (temp_amount * coalesce(credit_memos.exchange_rate, 1)) amount,
         coalesce(credit_memo_lines.sales_item_account_id, items.income_account_id, items.expense_account_id) as account_id,
         credit_memos.customer_id,
         coalesce(credit_memo_lines.sales_item_class_id, credit_memo_lines.discount_class_id, credit_memos.class_id) as class_id,
