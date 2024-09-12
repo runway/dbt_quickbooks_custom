@@ -35,6 +35,7 @@ final as (
     inner join deposit_lines 
         on deposits.deposit_id = deposit_lines.deposit_id
         and deposits.source_relation = deposit_lines.source_relation
+    where deposits.total_amount > 0
 )
 
 select *

@@ -59,6 +59,7 @@ deposit_join as (
 
     left join uf_accounts
         on uf_accounts.source_relation = deposits.source_relation
+    where deposits.total_amount > 0
 
 ),
 
