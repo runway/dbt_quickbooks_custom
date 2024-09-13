@@ -105,7 +105,7 @@ invoice_join as (
         invoices.currency_id,
         invoice_lines.index,
         invoices.transaction_date as transaction_date,
-        case when invoice_lines.discount_account_id is not null then invoice_lines.amounts * (-1)
+        case when invoice_lines.discount_account_id is not null then invoice_lines.amount * (-1)
             else invoice_lines.amount
         end discount_check_amount,
         case 
