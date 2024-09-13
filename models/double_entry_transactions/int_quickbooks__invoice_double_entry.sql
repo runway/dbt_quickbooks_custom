@@ -105,9 +105,12 @@ invoice_join as (
         invoices.currency_id,
         invoice_lines.index,
         invoices.transaction_date as transaction_date,
+        case when invoice_lines.discount_account_id is not null then invoice_lines.amounts * (-1)
+            else invoice_lines.amount
+        end discount_check_amount,
         case 
-            when invoice_lines.index = 0 then (invoice_lines.amount + invoices.total_tax)
-            else invoice_lines.amount 
+            when invoice_lines.index = 0 then (discount_check_amount + invoices.total_tax)
+            else discount_check_amount
         end temp_amount,
 
         {% if var('using_invoice_bundle', True) %}
