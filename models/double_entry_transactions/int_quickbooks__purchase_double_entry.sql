@@ -37,7 +37,7 @@ purchase_join as (
             else purchase_lines.amount 
         end temp_amount,
         temp_amount unexchanged_amount,
-        (temp_amount * coalesce(credit_memos.exchange_rate, 1)) amount,
+        (temp_amount * coalesce(purchases.exchange_rate, 1)) amount,
         coalesce(purchase_lines.account_expense_account_id, items.parent_expense_account_id, items.expense_account_id) as payed_to_account_id,
         purchases.account_id as payed_from_account_id,
         case when coalesce(purchases.credit, false) = true then 'debit' else 'credit' end as payed_from_transaction_type,
