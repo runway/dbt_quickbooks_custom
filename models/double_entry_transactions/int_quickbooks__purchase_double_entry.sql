@@ -32,8 +32,12 @@ purchase_join as (
         purchases.source_relation,
         purchase_lines.index,
         purchases.transaction_date,
-        purchase_lines.amount unexchanged_amount,
-        (purchase_lines.amount * coalesce(purchases.exchange_rate, 1)) amount,
+        case 
+            when purchase_lines.index = 0 then (purchase_lines.amount + purchases.total_tax)
+            else purchase_lines.amount 
+        end temp_amount,
+        temp_amount unexchanged_amount,
+        (temp_amount * coalesce(purchases.exchange_rate, 1)) amount,
         coalesce(purchase_lines.account_expense_account_id, items.parent_expense_account_id, items.expense_account_id) as payed_to_account_id,
         purchases.account_id as payed_from_account_id,
         case when coalesce(purchases.credit, false) = true then 'debit' else 'credit' end as payed_from_transaction_type,
