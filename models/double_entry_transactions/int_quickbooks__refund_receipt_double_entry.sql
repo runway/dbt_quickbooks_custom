@@ -37,7 +37,7 @@ refund_receipt_join as (
         refund_receipt_lines.index,
         refund_receipts.transaction_date,
         case 
-            when refund_receipt_lines.index = 0 then (refund_receipt_lines.amount + refund_receipts.total_tax)
+            when refund_receipt_lines.index = 0 then (refund_receipt_lines.amount + coalesce(refund_receipts.total_tax,0))
             else refund_receipt_lines.amount 
         end temp_tax_amount,
         case 

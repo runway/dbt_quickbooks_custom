@@ -106,7 +106,7 @@ invoice_join as (
         invoice_lines.index,
         invoices.transaction_date as transaction_date,
         case 
-            when invoice_lines.index = 0 then (invoice_lines.amount + invoices.total_tax)
+            when invoice_lines.index = 0 then (invoice_lines.amount + coalesce(invoices.total_tax,0))
             else invoice_lines.amount 
         end temp_amount,
 

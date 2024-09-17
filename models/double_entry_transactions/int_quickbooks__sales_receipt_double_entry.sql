@@ -37,7 +37,7 @@ sales_receipt_join as (
         sales_receipt_lines.index,
         sales_receipts.transaction_date,
         case 
-            when sales_receipt_lines.index = 0 then (sales_receipt_lines.amount + sales_receipts.total_tax)
+            when sales_receipt_lines.index = 0 then (sales_receipt_lines.amount + coalesce(sales_receipts.total_tax,0))
             else sales_receipt_lines.amount 
         end temp_amount,
         case 

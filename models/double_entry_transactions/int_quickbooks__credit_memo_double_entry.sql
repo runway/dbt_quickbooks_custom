@@ -51,7 +51,7 @@ credit_memo_join as (
         credit_memo_lines.index,
         credit_memos.transaction_date,
         case 
-            when credit_memo_lines.index = 0 then (credit_memo_lines.amount + credit_memos.total_tax)
+            when credit_memo_lines.index = 0 then (credit_memo_lines.amount + coalesce(credit_memos.total_tax,0))
             else credit_memo_lines.amount 
         end temp_tax_amount,
         case 
