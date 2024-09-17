@@ -33,7 +33,7 @@ purchase_join as (
         purchase_lines.index,
         purchases.transaction_date,
         case 
-            when purchase_lines.index = 0 then (purchase_lines.amount + purchases.total_tax)
+            when purchase_lines.index = 0 then (purchase_lines.amount + coalesce(purchases.total_tax,0))
             else purchase_lines.amount 
         end temp_amount,
         temp_amount unexchanged_amount,
