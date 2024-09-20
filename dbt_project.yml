@@ -17,6 +17,7 @@ models:
     intermediate:
       +materialized: ephemeral
 vars:
+  quickbooks_union_schemas: ['quickbooks','quickbooks___goex']
   quickbooks:
     account: "{{ ref('stg_quickbooks__account') }}"
     address: "{{ ref('stg_quickbooks__address') }}"
