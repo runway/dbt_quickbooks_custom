@@ -5,6 +5,9 @@ version: '0.13.1'
 
 require-dbt-version: [">=1.3.0", "<2.0.0"]
 
+vars:
+    quickbooks_union_schemas: ['quickbooks','quickbooks___goex']
+
 models:
   quickbooks:
     +materialized: table
@@ -17,7 +20,6 @@ models:
     intermediate:
       +materialized: ephemeral
 vars:
-  quickbooks_union_schemas: ['quickbooks','quickbooks___goex']
   quickbooks:
     account: "{{ ref('stg_quickbooks__account') }}"
     address: "{{ ref('stg_quickbooks__address') }}"
