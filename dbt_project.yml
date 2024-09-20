@@ -75,6 +75,8 @@ vars:
     using_sales_receipt: true
     using_credit_card_payment_txn: true
 
+    quickbooks_union_schemas: ['quickbooks','quickbooks___goex']
+
 analysis-paths: ["analysis"]
 clean-targets:
 - target
