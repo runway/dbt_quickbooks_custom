@@ -43,8 +43,12 @@ deposit_join as (
         deposits.source_relation,
         deposit_lines.index,
         deposits.transaction_date,
-        deposit_lines.amount unexchanged_amount,
-        deposit_lines.amount * (coalesce(deposits.home_total_amount/nullif(deposits.total_amount,0), 1)) amount,
+        case 
+            when deposit_lines.index = 0 then (deposit_lines.amount - coalesce(deposit_lines.cash_back_amount,0))
+            else deposit_lines.amount 
+        end temp_amount,
+        temp_amount unexchanged_amount,
+        temp_amount * (coalesce(deposits.home_total_amount/nullif(deposits.total_amount,0), 1)) amount,
         deposits.account_id as deposit_to_acct_id,
         coalesce(deposit_lines.deposit_account_id, uf_accounts.account_id) as deposit_from_acct_id,
         deposit_customer_id as customer_id,
