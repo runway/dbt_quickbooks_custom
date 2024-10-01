@@ -36,12 +36,8 @@ bill_join as (
         bills.source_relation,
         bill_lines.index,
         bills.transaction_date,
-        case 
-            when bill_lines.item_expense_billable_status = 'NotBillable' then 0
-            else bill_lines.amount 
-        end temp_amount,
-        (temp_amount*coalesce(bills.exchange_rate,1)) as amount,
-        temp_amount unexchanged_amount,
+        (bill_lines.amount*coalesce(bills.exchange_rate,1)) as amount,
+        bill_lines.amount unexchanged_amount,
         coalesce(bill_lines.account_expense_account_id,items.asset_account_id, items.expense_account_id, items.parent_expense_account_id, items.expense_account_id, items.parent_income_account_id, items.income_account_id) as payed_to_account_id,
         bills.payable_account_id,
         coalesce(bill_lines.account_expense_customer_id, bill_lines.item_expense_customer_id) as customer_id,
