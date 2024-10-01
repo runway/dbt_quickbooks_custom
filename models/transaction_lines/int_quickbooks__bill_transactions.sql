@@ -35,8 +35,12 @@ final as (
         bills.vendor_id,
         coalesce(bill_lines.account_expense_billable_status, bill_lines.item_expense_billable_status) as billable_status,
         coalesce(bill_lines.description, items.name) as description,
-        bill_lines.amount * (coalesce(bills.exchange_rate, 1)) amount,
-        bills.total_amount * (coalesce(bills.exchange_rate, 1)) total_amount
+        case 
+            when bill_lines.item_expense_billable_status = 'NotBillable' then 0
+            else bill_lines.amount 
+        end temp_amount,
+        temp_amount * (coalesce(bills.exchange_rate, 1)) amount,
+        temp_amount * (coalesce(bills.exchange_rate, 1)) total_amount
     from bills
 
     inner join bill_lines 
