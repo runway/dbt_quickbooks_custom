@@ -23,6 +23,18 @@ accounts as (
     from {{ ref('stg_quickbooks__account') }}
 ),
 
+bills as (
+
+    select *
+    from {{ ref('stg_quickbooks__bill') }}
+),
+
+bill_linked_txn as (
+
+    select *
+    from {{ ref('stg_quickbooks__bill_linked_txn') }}
+),
+
 ap_accounts as (
 
     select
@@ -44,7 +56,7 @@ bill_payment_join as (
         row_number() over(partition by bill_payments.bill_payment_id, bill_payments.source_relation 
             order by bill_payments.source_relation, bill_payments.transaction_date) - 1 as index,
         bill_payments.transaction_date,
-        (bill_payments.total_amount*coalesce(bill_payments.exchange_rate,1)) as amount,
+        (bill_payments.total_amount*coalesce(coalesce(bills.exchange_rate,bill_payments.exchange_rate),1)) as amount,
         bill_payments.total_amount unexchanged_amount,
         coalesce(bill_payments.credit_card_account_id,bill_payments.check_bank_account_id) as payment_account_id,
         ap_accounts.account_id,
@@ -55,6 +67,14 @@ bill_payment_join as (
     left join ap_accounts
         on ap_accounts.source_relation = bill_payments.source_relation
         and ap_accounts.currency_id = bill_payments.currency_id
+    
+    left join bill_linked_txn
+        on bill_linked_txn.bill_payment_id = bill_payments.bill_payment_id
+        and bill_linked_txn.source_relation = bill_payments.source_relation
+
+    left join bills
+        on bills.bill_id = bill_linked_txn.bill_id
+        and bills.source_relation = bill_payments.source_relation
 ),
 
 final as (
