@@ -56,17 +56,13 @@ bill_payment_join as (
         row_number() over(partition by bill_payments.bill_payment_id, bill_payments.source_relation 
             order by bill_payments.source_relation, bill_payments.transaction_date) - 1 as index,
         bill_payments.transaction_date,
-        (bill_payment_lines.amount*coalesce(coalesce(bills.exchange_rate,bill_payments.exchange_rate),1)) as amount,
-        bill_payment_lines.amount unexchanged_amount,
+        (bill_payments.total_amount*coalesce(coalesce(bills.exchange_rate,bill_payments.exchange_rate),1)) as amount,
+        bill_payments.total_amount unexchanged_amount,
         coalesce(bill_payments.credit_card_account_id,bill_payments.check_bank_account_id) as payment_account_id,
         ap_accounts.account_id,
         bill_payments.vendor_id,
         bill_payments.department_id
     from bill_payments
-
-    join bill_payment_lines
-        on bill_payment_lines.bill_payment_id = bill_payments.bill_payment_id
-        and bill_payment_lines.source_relation = bill_payments.source_relation
 
     left join ap_accounts
         on ap_accounts.source_relation = bill_payments.source_relation
@@ -75,7 +71,6 @@ bill_payment_join as (
     left join bill_linked_txn
         on bill_linked_txn.bill_payment_id = bill_payments.bill_payment_id
         and bill_linked_txn.source_relation = bill_payments.source_relation
-        and bill_payment_lines.bill_id = bill_linked_txn.bill_id
 
     left join bills
         on bills.bill_id = bill_linked_txn.bill_id
